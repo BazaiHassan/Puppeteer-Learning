@@ -3,24 +3,33 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth"); // require stea
 puppeteer.use(StealthPlugin()); // enable stealth mode
 const fs = require("fs");
 
-async function getSearchResults(url, searchQuery){
+async function interceptRequest(url) {
     try {
         const browser = await puppeteer.launch({
-            headless:true,
+            headless: false,
             executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' // specify the path of your Chrome browser
         });
         const page = await browser.newPage();
-        await page.goto(url, {timeout: 60000});
-
+        
         /***Do what ever you want here */
-        await page.focus('textarea[name="q"]');
-        await page.keyboard.type(searchQuery);
-        await page.keyboard.press('Enter');
+        await page.setRequestInterception(true);
 
-        await page.waitForNavigation({waitUntil:'networkidle2'});
-        await page.screenshot({path:'query.png'})
+        page.on('request', (interceptedRequest) => {
+            if (interceptedRequest.url().endsWith('.png')) {
+                interceptedRequest.abrot();
+                console.log("Request Abrot :(")
+            } else {
+                interceptedRequest.headers({
+                    'seacretKey':'ThisIsTest'
+                });
+                interceptedRequest.continue();
+                console.log("Request Continued with headers!")
+            }
+        })
 
-        await browser.close();
+        await page.goto(url);
+
+        //await browser.close();
 
         console.log('Success!')
     } catch (error) {
@@ -28,10 +37,9 @@ async function getSearchResults(url, searchQuery){
     }
 }
 
-const url = 'https://google.com';
-const searchQuery = 'Bitcoin Price';
+const url = 'https://mlmond.com';
 
-getSearchResults(url, searchQuery);
+interceptRequest(url);
 
 
 
