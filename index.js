@@ -1,22 +1,21 @@
 const puppeteer = require("puppeteer");
 
-async function generatePDF(url, outputFile) {
+async function generateScreenShot(url, outputFile) {
     try {
-        const browser = await puppeteer.launch({ headers: false, headless: true });
+        const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         await page.goto(url)
-        await page.pdf({
-            path: outputFile,
-            format: 'A4'
-        });
+        await page.screenshot({ path: outputFile })
         await browser.close();
+        console.log("Success!")
     } catch (error) {
-
+        console.log("Unable to generate screenshot")
+        console.log(error.message)
     }
 }
 
-const url = 'http://google.com';
-const outputFile = 'output.pdf';
+const url = 'https://zillow.com';
+const outputFile = 'output.png';
 
-generatePDF(url, outputFile);
+generateScreenShot(url, outputFile);
