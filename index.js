@@ -1,26 +1,43 @@
 const puppeteer = require("puppeteer");
 
-async function run() {
-    // Launch the browser instance
-    const browser = await puppeteer.launch({
-        headless: false
-    });
-
+async function run (){
+    const browser = await puppeteer.launch({headless:false});
     const page = await browser.newPage();
 
-    await page.goto("https://mlmond.com")
-    const title = await page.title();
-    console.log(title);
+    // Navigate to page
+    await page.goto('http://google.com')
 
-    // Scrap all h1 tags
-    const heading = await page.$eval('h1', (element) => element.textContent);
-    console.log(heading);
+    // Extact All images
+    const images = await page.$$eval("img", (elements) => 
+        elements.map((element)=>({
+            src: element.src,
+            alt: element.alt
+        }))
+    );
 
-    await page.screenshot({ path: 'mlmond.png' });
+    // Extarct All images
+    const links = await page.$$eval("a", (elements)=> elements.map((element)=>({
+        href: element.href,
+        text: element.textContent
+    })))
 
-    await page.pdf({ path: 'mlmond.pdf' });
+    // Outputs
+    const imageCount = images.length;
+    const linkCount = links.length;
 
-    await browser.close();
+    const output = JSON.stringify({
+        images,
+        links,
+        imageCount,
+        linkCount
+    })
+
+    console.log(output)
+
+    await browser.close()
+
+
 }
 
-run();
+
+run()
