@@ -3,6 +3,10 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth"); // require stea
 puppeteer.use(StealthPlugin()); // enable stealth mode
 const fs = require("fs");
 
+const ppr = require("puppeteer");
+const device = ppr.KnownDevices["Galaxy S III"]
+
+
 async function simulateMobileDevice(url) {
     try {
         const browser = await puppeteer.launch({
@@ -12,14 +16,10 @@ async function simulateMobileDevice(url) {
         const page = await browser.newPage();
         
         /***Do what ever you want here */
-        await page.setUserAgent('Mozilla/5.0')
-        await page.setViewport({
-            width:375,
-            height:812
-        })
-
+        await page.emulate(device);
+        
         await page.goto(url);
-
+        
         await browser.close();
 
         console.log('Success!')
@@ -28,7 +28,7 @@ async function simulateMobileDevice(url) {
     }
 }
 
-const url = 'https://mlmond.com';
+const url = 'https://tradingview.com';
 
 simulateMobileDevice(url);
 
