@@ -3,7 +3,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth"); // require stea
 puppeteer.use(StealthPlugin()); // enable stealth mode
 const fs = require("fs");
 
-async function getSourceCode(url, outputData){
+async function getSearchResults(url, searchQuery){
     try {
         const browser = await puppeteer.launch({
             headless:true,
@@ -12,9 +12,13 @@ async function getSourceCode(url, outputData){
         const page = await browser.newPage();
         await page.goto(url, {timeout: 60000});
 
-        const sourceCode = await page.content();
+        /***Do what ever you want here */
+        await page.focus('textarea[name="q"]');
+        await page.keyboard.type(searchQuery);
+        await page.keyboard.press('Enter');
 
-        fs.writeFileSync(outputData, sourceCode, 'utf-8');
+        await page.waitForNavigation({waitUntil:'networkidle2'});
+        await page.screenshot({path:'query.png'})
 
         await browser.close();
 
@@ -24,7 +28,11 @@ async function getSourceCode(url, outputData){
     }
 }
 
-const url = 'https://zillow.com';
-const outputData = 'source.html';
+const url = 'https://google.com';
+const searchQuery = 'Bitcoin Price';
 
-getSourceCode(url, outputData)
+getSearchResults(url, searchQuery);
+
+
+
+
