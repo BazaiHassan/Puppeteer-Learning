@@ -3,7 +3,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth"); // require stea
 puppeteer.use(StealthPlugin()); // enable stealth mode
 const fs = require("fs");
 
-async function interceptRequest(url) {
+async function simulateMobileDevice(url) {
     try {
         const browser = await puppeteer.launch({
             headless: false,
@@ -12,24 +12,15 @@ async function interceptRequest(url) {
         const page = await browser.newPage();
         
         /***Do what ever you want here */
-        await page.setRequestInterception(true);
-
-        page.on('request', (interceptedRequest) => {
-            if (interceptedRequest.url().endsWith('.png')) {
-                interceptedRequest.abrot();
-                console.log("Request Abrot :(")
-            } else {
-                interceptedRequest.headers({
-                    'seacretKey':'ThisIsTest'
-                });
-                interceptedRequest.continue();
-                console.log("Request Continued with headers!")
-            }
+        await page.setUserAgent('Mozilla/5.0')
+        await page.setViewport({
+            width:375,
+            height:812
         })
 
         await page.goto(url);
 
-        //await browser.close();
+        await browser.close();
 
         console.log('Success!')
     } catch (error) {
@@ -39,7 +30,7 @@ async function interceptRequest(url) {
 
 const url = 'https://mlmond.com';
 
-interceptRequest(url);
+simulateMobileDevice(url);
 
 
 
